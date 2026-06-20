@@ -1,7 +1,4 @@
-# TEMPLATE — copy to `.github/workflows/sysdiag-ci.yml` in the zig-legos repo.
-# It is the worked example of wiring an app to the pinned scaffolding: build on
-# both backends and capture a live rodney screenshot of the dashboard.
-#
+# Worked example: build on both backends and capture a live rodney screenshot.
 # All build tools (Zig, uv, Chrome for Testing) come from the repo's own pinned
 # `ci-tools` release via the setup-mirrored-tools action — no third-party CDNs at
 # run time. ROD_CHROME_BIN is set by that action so rodney never downloads a
