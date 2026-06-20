@@ -10,12 +10,6 @@ same spirit: small, single-purpose, **offline-capable, version-pinned** tooling
 that doubles as a Claude Code skill. Each "lego" is a skill *plus* the
 scaffolding it needs *plus* a worked example you can run end-to-end.
 
-> **Staging note:** this folder currently lives inside the `tracers` repo as the
-> prep step for a standalone spin-out (the same playbook launchpad used). Paths
-> in the scripts assume **this folder is the repo root** — they're correct once
-> it's lifted out. See [`MIGRATION.md`](MIGRATION.md) for the move + the
-> decommission checklist on the tracers side.
-
 ## What's here
 
 | Piece | What it gives you |
@@ -23,7 +17,7 @@ scaffolding it needs *plus* a worked example you can run end-to-end.
 | [`skills/spider/`](skills/spider/SKILL.md) | Build *and* prove Zig HTTP, JSON, and HTMX services on spider v0.6.7 — a known-good app template, the API cheatsheet + gotchas, and `prove.sh`, the one-command scaffold → build → screenshot → [showboat](https://pypi.org/project/showboat/) demo lifecycle. |
 | [`scaffolding/ci/`](scaffolding/ci/README.md) | The dependency-pinning core: `tools.lock` (Zig/uv/Chrome, checksum-pinned), `seed.sh` (mirror them into a `ci-tools` release), and the story behind it. |
 | [`scaffolding/setup-mirrored-tools/`](scaffolding/setup-mirrored-tools/action.yml) | A composite GitHub Action that fetches the pinned tools for the runner and verifies every byte — drop-in for any app's CI. |
-| [`scaffolding/workflows/`](scaffolding/workflows/) | Copy-paste CI workflow templates (seed the release; build + screenshot an app). |
+| [`.github/workflows/`](.github/workflows/) | CI: seed the `ci-tools` release; build + screenshot the sysdiag example on Linux and macOS. |
 | [`plugins/spider-bundle/`](plugins/spider-bundle/README.md) | `pack.sh` bundles the `spider` skill + a vendored `tools.lock` into something you can hand to anyone — no checkout required. |
 | [`examples/sysdiag/`](examples/sysdiag/README.md) | A complete spider + HTMX app (a live system-usage dashboard) wired to the scaffolding above — the reference every new app is modeled on. |
 
