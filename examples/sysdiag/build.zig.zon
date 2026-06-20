@@ -1,0 +1,14 @@
+.{
+    .name = .sysdiag,
+    .version = "0.0.0",
+    // If zig rejects this fingerprint, paste the value from the error message.
+    .fingerprint = 0x8ec1ed388e826228,
+    .minimum_zig_version = "0.17.0-dev.667+0569f1f6a",
+    .dependencies = .{
+        .spider = .{
+            .url = "git+https://github.com/llllOllOOll/spider?ref=v0.6.7#16eb4cbac3d6045b5cd46b605788edca90c32eab",
+            .hash = "spider-0.6.7-P7cGrnWyrgCw3ZhalGsUHrgYsgl4BoMmaIMRotmizBA7",
+        },
+    },
+    .paths = .{""},
+}

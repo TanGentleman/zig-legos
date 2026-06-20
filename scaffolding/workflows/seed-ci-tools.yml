@@ -1,0 +1,25 @@
+# TEMPLATE — copy to `.github/workflows/seed-ci-tools.yml` in the zig-legos repo.
+#
+# Populate the `ci-tools` release with the pinned binaries in
+# scaffolding/ci/tools.lock. This is the only automation that reaches out to
+# upstream CDNs. Run it manually after bumping a version in tools.lock. (GitHub
+# only allows dispatching a workflow that exists on the default branch — for the
+# very first run, bootstrap the release locally with
+# `GH_TOKEN=$(gh auth token) bash scaffolding/ci/seed.sh`.)
+name: seed ci-tools
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write # create/replace the ci-tools release and its tag
+
+jobs:
+  seed:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7.0.0
+      - name: Mirror pinned tools into the ci-tools release
+        run: bash scaffolding/ci/seed.sh

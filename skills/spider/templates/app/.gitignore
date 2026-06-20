@@ -1,0 +1,6 @@
+zig-out/
+.zig-cache/
+.tools/
+.rodney/
+quickstart.png
+.env

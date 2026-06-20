@@ -1,0 +1,81 @@
+name: Set up mirrored CI tools
+description: >
+  Install Zig, uv, and Chrome for Testing from the pinned `ci-tools` release,
+  plus pinned rodney from PyPI. Exports PATH entries and ROD_CHROME_BIN.
+
+runs:
+  using: composite
+  steps:
+    - name: Install Chrome runtime libraries (Linux only)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          libnss3 libnspr4 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 \
+          libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
+          libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2t64 \
+          libatspi2.0-0t64 fonts-liberation libgtk-3-0t64
+
+    - name: Download, verify, and extract pinned tools
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        lock="$GITHUB_WORKSPACE/scaffolding/ci/tools.lock"
+        tag=$(jq -r .release_tag "$lock")
+
+        case "$RUNNER_OS-$RUNNER_ARCH" in
+          Linux-X64)   plat=linux-x86_64 ;;
+          macOS-ARM64) plat=macos-aarch64 ;;
+          *) echo "::error::unsupported runner $RUNNER_OS-$RUNNER_ARCH"; exit 1 ;;
+        esac
+
+        dir="$RUNNER_TEMP/ci-tools"
+        mkdir -p "$dir"
+        zig_asset=$(jq -r --arg p "$plat" '.tools.zig.platforms[$p].asset' "$lock")
+        uv_asset=$(jq -r --arg p "$plat" '.tools.uv.platforms[$p].asset' "$lock")
+        chrome_asset=$(jq -r --arg p "$plat" '.tools.chrome.platforms[$p].asset' "$lock")
+
+        gh release download "$tag" -D "$dir" \
+          -p "$zig_asset" -p "$uv_asset" -p "$chrome_asset" -p SHA256SUMS
+
+        cd "$dir"
+        for a in "$zig_asset" "$uv_asset" "$chrome_asset"; do
+          exp=$(awk -v f="$a" '$2 == f {print $1}' SHA256SUMS)
+          [ -n "$exp" ] || { echo "::error::no checksum for $a in SHA256SUMS"; exit 1; }
+          act=$(shasum -a 256 "$a" | awk '{print $1}')
+          [ "$exp" = "$act" ] || { echo "::error::checksum mismatch for $a ($exp != $act)"; exit 1; }
+          echo "verified $a"
+        done
+
+        # Zig: tarball extracts to a single zig-<ver>/ dir containing the binary.
+        tar -xf "$zig_asset"
+        zig_dir=$(find "$dir" -maxdepth 1 -type d -name 'zig-*' | head -n1)
+        echo "$zig_dir" >> "$GITHUB_PATH"
+
+        # uv: tarball extracts to uv-<target>/ containing the uv binary.
+        tar -xf "$uv_asset"
+        uv_dir=$(find "$dir" -maxdepth 1 -type d -name 'uv-*' | head -n1)
+        echo "$uv_dir" >> "$GITHUB_PATH"
+
+        # Chrome for Testing: zip extracts to a per-platform dir.
+        unzip -q "$chrome_asset"
+        if [ "$plat" = linux-x86_64 ]; then
+          chrome_bin="$dir/chrome-linux64/chrome"
+        else
+          chrome_bin="$dir/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+        fi
+        chmod +x "$chrome_bin" 2>/dev/null || true
+        echo "ROD_CHROME_BIN=$chrome_bin" >> "$GITHUB_ENV"
+
+    - name: Install pinned rodney from PyPI
+      shell: bash
+      run: |
+        set -euo pipefail
+        lock="$GITHUB_WORKSPACE/scaffolding/ci/tools.lock"
+        ver=$(jq -r .tools.rodney.version "$lock")
+        uv tool install "rodney==$ver"
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"

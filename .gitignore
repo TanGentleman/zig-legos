@@ -1,0 +1,9 @@
+# Pinned tools fetched by quickstart/lifecycle (cached, never committed)
+.tools/
+# Zig build output
+zig-out/
+.zig-cache/
+# Demo/proof artifacts generated locally
+**/quickstart.png
+# Packed bundle output
+/spider-bundle/

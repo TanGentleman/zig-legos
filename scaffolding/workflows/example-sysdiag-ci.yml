@@ -1,0 +1,91 @@
+# TEMPLATE — copy to `.github/workflows/sysdiag-ci.yml` in the zig-legos repo.
+# It is the worked example of wiring an app to the pinned scaffolding: build on
+# both backends and capture a live rodney screenshot of the dashboard.
+#
+# All build tools (Zig, uv, Chrome for Testing) come from the repo's own pinned
+# `ci-tools` release via the setup-mirrored-tools action — no third-party CDNs at
+# run time. ROD_CHROME_BIN is set by that action so rodney never downloads a
+# browser; the assertion below enforces it.
+name: sysdiag example CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scaffolding/setup-mirrored-tools/**"
+      - "scaffolding/ci/tools.lock"
+      - ".github/workflows/sysdiag-ci.yml"
+      - "examples/sysdiag/**"
+  pull_request:
+    paths:
+      - "scaffolding/setup-mirrored-tools/**"
+      - "scaffolding/ci/tools.lock"
+      - ".github/workflows/sysdiag-ci.yml"
+      - "examples/sysdiag/**"
+
+concurrency:
+  group: sysdiag-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshot:
+    name: Build & screenshot (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15] # macos-15 is arm64 → exercises the Darwin backend
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: examples/sysdiag
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - name: Set up mirrored CI tools
+        uses: ./scaffolding/setup-mirrored-tools
+
+      - name: Build
+        run: zig build
+
+      - name: Run server
+        run: |
+          ./zig-out/bin/sysdiag > /tmp/sysdiag.log 2>&1 &
+          echo $! > /tmp/sysdiag.pid
+          for _ in $(seq 1 40); do
+            curl -sf http://127.0.0.1:3000/up >/dev/null && exit 0
+            sleep 0.5
+          done
+          echo "server did not come up:"; cat /tmp/sysdiag.log; exit 1
+
+      - name: Screenshot the dashboard
+        # ROD_CHROME_BIN is exported by setup-mirrored-tools; go-rod uses it and
+        # makes no browser-download request.
+        run: |
+          rodney start
+          rodney open http://127.0.0.1:3000/
+          rodney waitidle
+          rodney sleep 3   # let one 2s HTMX poll replace the "Loading…" card
+          rodney screenshot -w 1100 -h 680 "/tmp/sysdiag-${{ matrix.os }}.png"
+          rodney stop
+
+      - name: Assert no browser was downloaded
+        run: |
+          cache="${XDG_CACHE_HOME:-$HOME/.cache}/rod/browser"
+          if [ -d "$cache" ] && [ -n "$(ls -A "$cache" 2>/dev/null)" ]; then
+            echo "::error::rodney downloaded a browser into $cache — ROD_CHROME_BIN was not honored"
+            ls -laR "$cache"
+            exit 1
+          fi
+          echo "OK: no browser download ($cache empty or absent)"
+
+      - name: Stop server
+        if: always()
+        run: kill "$(cat /tmp/sysdiag.pid)" 2>/dev/null || true
+
+      - name: Upload screenshot artifact
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: sysdiag-screenshot-${{ matrix.os }}
+          path: /tmp/sysdiag-${{ matrix.os }}.png
+          if-no-files-found: error

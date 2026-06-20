@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>sysdiag — system diagnostics</title>
+  <script src="/htmx.js"></script>
+  <style>
+    :root {
+      --bg: #0b0e1a;
+      --card: rgba(255, 255, 255, 0.045);
+      --edge: rgba(255, 255, 255, 0.09);
+      --text: #e8ecf8;
+      --dim: #8a93b2;
+      --accent: #6ee7ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(110, 95, 255, 0.22), transparent 60%),
+        radial-gradient(800px 500px at 95% 15%, rgba(45, 212, 191, 0.14), transparent 55%),
+        var(--bg);
+    }
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.8rem;
+      padding: 2.2rem 2.5rem 0.4rem;
+    }
+    h1 { margin: 0; font-size: 1.5rem; letter-spacing: 0.02em; }
+    h1 .dot { color: var(--accent); }
+    header .sub { color: var(--dim); font-size: 0.85rem; }
+    .pulse {
+      margin-left: auto;
+      color: var(--dim);
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .pulse::before {
+      content: "";
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.35; } }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.1rem;
+      padding: 1.4rem 2.5rem 2.5rem;
+      max-width: 1100px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--edge);
+      border-radius: 16px;
+      padding: 1.15rem 1.3rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+    .label {
+      color: var(--dim);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .value {
+      font-size: 2.1rem;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(90deg, #6ee7ff, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .value .unit { font-size: 1.1rem; margin-left: 2px; }
+    .value-sm { font-size: 1.35rem; font-weight: 600; margin: 0.35rem 0 0.45rem; }
+    .track {
+      height: 7px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 0.7rem 0 0.6rem;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #2dd4bf, #6ee7ff);
+      transition: width 0.6s ease;
+    }
+    .bar.warm { background: linear-gradient(90deg, #fbbf24, #fb923c); }
+    .bar.hot  { background: linear-gradient(90deg, #fb7185, #ef4444); }
+    .detail { color: var(--dim); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>sysdiag<span class="dot">.</span></h1>
+    <span class="sub">live system usage &mdash; served by spider</span>
+    <span class="pulse">refreshing every 2s</span>
+  </header>
+  <!-- HTMX polls the server-rendered card grid -->
+  <div id="grid" hx-get="/metrics" hx-trigger="load, every 2s" hx-swap="innerHTML">
+    <div class="card"><div class="label">Loading</div><div class="detail">first sample&hellip;</div></div>
+  </div>
+</body>
+</html>

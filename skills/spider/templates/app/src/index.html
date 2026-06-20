@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+  <title>Spider + HTMX app</title>
+  <script src="/htmx.js"></script>
+</head>
+<body style="font-family: sans-serif; margin: 3rem">
+  <h1>Spider + HTMX app</h1>
+  <!-- HTMX: GET /clicked and swap the fragment into #out -->
+  <button hx-get="/clicked" hx-target="#out">Click me</button>
+  <p id="out">No clicks yet.</p>
+</body>
+</html>
