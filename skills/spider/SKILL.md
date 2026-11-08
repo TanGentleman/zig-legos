@@ -1,11 +1,11 @@
 ---
 name: spider
-description: Build and prove web servers in Zig using the spider framework — HTTP services, JSON APIs, or HTMX UIs. Covers the toolchain gate, scaffolding from a known-good template, the spider v0.11.0 API, the one-command build-and-prove lifecycle (prove.sh), and proving the result with showboat/rodney.
+description: Build and prove web servers in Zig using the spider framework — HTTP services, JSON APIs, or HTMX UIs. Covers the toolchain gate, scaffolding from a known-good template, the spider v0.12.0 API, the one-command build-and-prove lifecycle (prove.sh), and proving the result with showboat/rodney.
 ---
 
 # Building (and proving) systems with spider — the Zig web framework
 
-Verified against **spider v0.11.0** on **Zig 0.17.1** (2026-11), Linux. If you use a
+Verified against **spider v0.12.0** on **Zig 0.17.1** (2026-11), Linux. If you use a
 different spider tag, re-verify against its source and `llms.txt` — the API moves fast.
 
 Read `references/cheatsheet.md` and `references/gotchas.md` BEFORE writing any code.
@@ -40,7 +40,7 @@ app or the script can't cover your case.
 
 ## 1. Toolchain gate (do this first, it blocks everything)
 
-spider v0.11.0 requires a Zig 0.17 release (`minimum_zig_version = "0.17.0"`). The
+spider v0.12.0 requires a Zig 0.17 release (`minimum_zig_version = "0.17.0"`). The
 repo pins 0.17.1; if your PATH zig is older, fetch a project-local one:
 
 ```sh
@@ -76,15 +76,15 @@ error message prints — that is the expected flow, not a failure.
 ## 3. Extend it
 
 Routes, handlers, JSON, HTMX detection, outbound HTTP: all in `references/cheatsheet.md`,
-every signature verified against v0.11.0 source. Rules of thumb:
+every signature verified against v0.12.0 source. Rules of thumb:
 
 - spider runs many worker threads — any shared mutable state must be `std.atomic.Value`.
 - Allocate per-request memory from `c.arena`; it is freed after the response.
 - `zig build test` runs the app's `test` blocks; keep parsing and formatting in
   plain functions so they can be tested without a server.
-- New dependency pins: `$ZIG fetch --save=spider 'git+https://github.com/llllOllOOll/spider?ref=v0.11.0#4deaac0c713a78d801763cc072c9b48182447625'`.
+- New dependency pins: `$ZIG fetch --save=spider 'git+https://github.com/llllOllOOll/spider?ref=v0.12.0#ee554ad3b88efef11565162aaade1198547e0dda'`.
 - When the cheatsheet doesn't cover an API, do NOT trust memory (0.16/0.17 drift):
-  clone spider guarded (`[ -d temp/spider ] || git clone --depth 1 --branch v0.11.0
+  clone spider guarded (`[ -d temp/spider ] || git clone --depth 1 --branch v0.12.0
   https://github.com/llllOllOOll/spider temp/spider`) and grep `src/core/context.zig`,
   `src/core/app.zig`, and `llms.txt` (the README is partly stale). zigpeek is for stdlib only.
 

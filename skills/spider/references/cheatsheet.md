@@ -1,4 +1,4 @@
-# spider v0.11.0 API cheatsheet (verified against source, 2026-11)
+# spider v0.12.0 API cheatsheet (verified against source, 2026-11)
 
 ## App and routes
 
@@ -27,9 +27,8 @@ declares this app embeds its assets and uses no runtime template engine.
 
 ```zig
 c.arena                          // per-request allocator, freed after the response
-c.params.get("id")               // ?[]const u8, from :id in the route
-                                 //   (README shows c.param("id") — that method does
-                                 //    NOT exist in v0.11.0; use the params hashmap)
+c.params.get("id")               // ?[]const u8, from :id in the route, percent-decoded
+                                 //   (there is no c.param("id") method)
 c.query("q")                     // ?[]const u8
 c.header("x-thing")              // ?[]const u8
 c.isHtmx()                       // true if HX-Request header present
@@ -94,6 +93,22 @@ spider spawns ~12 worker threads. Globals must be atomic:
 ```zig
 var hits = std.atomic.Value(u32).init(0);
 const n = hits.fetchAdd(1, .monotonic) + 1;
+```
+
+## Tests against the running app
+
+`spider.testing.start(serve)` runs `serve` (a `fn () !void` that builds the app and
+calls `listen`) on its own thread, once per test binary, on a free 127.0.0.1 port; the
+port passed to `listen` is ignored. The template and sysdiag split `main` this way.
+
+```zig
+test "home page" {
+    const app = try spider.testing.start(serve);
+    var res = try app.get("/");          // also postForm, postJson, request
+    defer res.deinit();
+    try res.expectStatus(200);
+    try res.expectContains("hx-get");    // res.body, res.header("content-type")
+}
 ```
 
 ## build.zig wiring (see templates/app/ for the whole thing)

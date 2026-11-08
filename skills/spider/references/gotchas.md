@@ -1,23 +1,23 @@
 # Gotchas — one scar per line
 
-Observed on spider v0.6.7 + Zig 0.17.0-dev.813 (2026-06) unless marked v0.11.0 (re-checked
-on spider v0.11.0 + Zig 0.17.1, Linux, 2026-11). Re-check on other versions.
+Observed on spider v0.6.7 + Zig 0.17.0-dev.813 (2026-06) unless marked v0.12.0 (re-checked
+on spider v0.12.0 + Zig 0.17.1, Linux, 2026-11). Re-check on other versions.
 
-- **Toolchain gate** (v0.11.0): spider v0.8.0+ needs a Zig 0.17 release; v0.6.7 needs a
+- **Toolchain gate** (v0.12.0): spider v0.8.0+ needs a Zig 0.17 release; v0.6.7 needs a
   0.17.0-dev nightly and fails on 0.17.1 (`no field named 'Debug' in enum
   'lang.Optimize'`). Older PATH zigs hard-error before compiling anything.
-- **No macOS builds** (v0.11.0): `src/modules/health.zig` calls
+- **No macOS builds** (v0.12.0): `src/modules/health.zig` calls
   `std.os.linux.clock_gettime`, so any app fails for macOS with `struct 'elf.AT…' has
   no member named 'SYSINFO_EHDR'` (same on Zig 0.17.0 and 0.17.1, native or
   `-Dtarget=aarch64-macos`). Build on Linux until spider fixes it.
-- **Routes take three arguments** (v0.11.0): `.get(path, handler, .{})`. Two-argument
+- **Routes take three arguments** (v0.12.0): `.get(path, handler, .{})`. Two-argument
   calls from older docs don't compile.
 - **Bodyless POST kills the worker**: `curl -X POST` with no `-d` (no Content-Length at
   all) trips `std.http.Server` assert in `discardBody` → thread panic. Always send a
   body in tests; htmx and browsers send `Content-Length: 0`, which is fine.
-- **README drift**: README's `c.param("id")` doesn't exist in v0.11.0 — use
-  `c.params.get("id")`. When README and source disagree, the source wins; grep
-  `src/core/context.zig` first.
+- **Path params** (v0.12.0): there is no `c.param("id")` (older READMEs showed one); use
+  `c.params.get("id")`, percent-decoded since v0.12.0. When docs and source disagree,
+  the source wins; grep `src/core/context.zig` first.
 - **`@embedFile` cannot escape the module root**: vendored assets must live under
   `src/` (e.g. `src/vendor/htmx.min.js`), not next to it.
 - **CDNs may be blocked** in sandboxed environments (unpkg/jsdelivr → 403) while
