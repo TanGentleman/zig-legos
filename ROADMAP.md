@@ -37,16 +37,18 @@ the setup code duplicated between `quickstart.sh` and `prove.sh`.
 - `zig-legos-5`: spider v0.12.0; uv 0.13.7 and Chrome 157 in `tools.lock`; actions
   pinned by SHA; route tests through `spider.testing`; README pins and boundaries;
   skill docs re-checked on v0.12.0; regenerated sysdiag demo.
+- `zig-legos-6`: README cut to 29 words; details moved to IMPLEMENTATION.md.
 
 ## Apply upstream
 
 ```bash
-# in kranti-sandbox; N = the last branch you want (1..5)
+# in kranti-sandbox; N = the last branch you want (1..6), 6 for the whole stack
+N=6
 base=$(git log -1 --format=%H --grep='^Import zig-legos upstream' origin/zig-legos-1)
-git format-patch --relative=zig-legos "$base"..origin/zig-legos-N -o /tmp/zig-legos-N
+git format-patch --relative=zig-legos "$base"..origin/zig-legos-$N -o /tmp/zig-legos-$N
 # in a clean upstream clone at 9be30bb
 git clone https://github.com/TanGentleman/zig-legos && cd zig-legos
-git am /tmp/zig-legos-N/*.patch
+git am /tmp/zig-legos-$N/*.patch
 zig fmt --check examples skills
 skills/spider/prove.sh --no-demo /tmp/spider-app && (cd /tmp/spider-app && zig build test)
 (cd examples/sysdiag && ./quickstart.sh && zig build test)   # from -2 on
