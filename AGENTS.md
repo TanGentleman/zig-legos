@@ -29,5 +29,4 @@ examples/      # sysdiag — a full spider+HTMX app wired to the scaffolding
 ## Provenance
 
 These blocks were factored out of the [tracers](https://github.com/TanGentleman/tracers)
-monorepo. If something here still assumes a tracers path, that's a migration
-bug — see `MIGRATION.md`.
+monorepo. If something here still assumes a tracers path, it's a bug.

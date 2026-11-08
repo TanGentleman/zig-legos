@@ -5,11 +5,6 @@ Testing — from a single rolling `ci-tools` release **this repo owns**, instead
 third-party CDNs. Runs are reproducible (every byte is checksum-pinned) and
 network-isolated (the only CDN traffic happens at seed time, not in CI).
 
-> **After spin-out:** the `ci-tools` release must be (re)seeded under the
-> `zig-legos` repo so this pinning is self-contained — run `seed.sh` once there
-> (see [`../../MIGRATION.md`](../../MIGRATION.md)). Until then the lock's URLs
-> still resolve from upstream CDNs at seed time.
-
 ## Pieces
 
 - **`tools.lock`** — JSON manifest, the single source of truth: per-tool

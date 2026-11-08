@@ -1,5 +1,3 @@
-# TEMPLATE — copy to `.github/workflows/seed-ci-tools.yml` in the zig-legos repo.
-#
 # Populate the `ci-tools` release with the pinned binaries in
 # scaffolding/ci/tools.lock. This is the only automation that reaches out to
 # upstream CDNs. Run it manually after bumping a version in tools.lock. (GitHub
