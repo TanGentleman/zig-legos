@@ -21,33 +21,49 @@ screenshot-proven spider app in one command, without re-deriving a toolchain.
   (`app.zig:567: no field named 'Debug' in enum 'lang.Optimize'`). spider v0.8.0+
   targets Zig 0.17.0 releases; latest tags are v0.11.0 (2026-10-18) and v0.12.0
   (2026-11-07).
-- No tests: neither `build.zig` has a `test` step. CI builds only sysdiag; the
-  skill's template is never built in CI.
+- No tests: neither `build.zig` had a `test` step and CI never built the
+  skill's template (`-2` adds both).
 - `MIGRATION.md` described the tracers spin-out, already done (cut on `-1`).
 
 ## Signal vs noise
 
 Keep: the template, the cheatsheet and gotchas (re-verified per spider tag),
 `prove.sh`, sysdiag, `tools.lock` and the mirror. Cut: spin-out notes, docs
-that pin numbers to an old nightly, the setup code duplicated between
-`quickstart.sh` and `prove.sh`.
+that pin numbers to an old nightly, dead tracers links. Still noise, not cut:
+the setup code duplicated between `quickstart.sh` and `prove.sh`.
 
 ## Stack
 
 - `zig-legos-1`: import, fix the dead tracers download URL, drop spin-out notes, this file.
+- `zig-legos-2`: `zig build test` with unit tests for sysdiag and the template; CI
+  checks `zig fmt`, builds and tests both, and smoke-tests sysdiag's routes.
+- `zig-legos-3`: README a stranger can follow, regenerated sysdiag demo, stale doc lines.
+- `zig-legos-4` (optional, see Needs Tan): Zig 0.17.1 + spider v0.11.0, Linux only.
 
-## Apply a branch upstream
+## Apply upstream
 
 ```bash
-# in kranti-sandbox: everything after the import commit
+# in kranti-sandbox; N = the last branch you want (1..4)
 base=$(git log -1 --format=%H --grep='^Import zig-legos upstream' zig-legos-1)
-git format-patch --relative=zig-legos "$base"..zig-legos-1 -o /tmp/zig-legos-1
+git format-patch --relative=zig-legos "$base"..zig-legos-N -o /tmp/zig-legos-N
 # in a clean upstream clone at 9be30bb
 git clone https://github.com/TanGentleman/zig-legos && cd zig-legos
-git am /tmp/zig-legos-1/*.patch
-skills/spider/prove.sh --no-demo /tmp/spider-app
+git am /tmp/zig-legos-N/*.patch
+zig fmt --check examples skills
+skills/spider/prove.sh --no-demo /tmp/spider-app && (cd /tmp/spider-app && zig build test)
+(cd examples/sysdiag && ./quickstart.sh && zig build test)   # from -2 on
 ```
 
-For a stacked branch, use the previous branch as the base: `zig-legos-1..zig-legos-2`.
+One branch at a time: `zig-legos-1..zig-legos-2`, and so on. With `-4`, put Zig
+0.17.1 on PATH or run the seed workflow first (see below).
 
 ## Needs Tan
+
+- `-4` or not: it trades macOS (spider >= v0.8 doesn't compile for macOS on Zig
+  0.17, `health.zig` uses `std.os.linux.clock_gettime`) for an official Zig. Without
+  it the stack stays on the mirrored nightly, which still works on both OSes.
+- After `-4`: run the `seed-ci-tools` workflow so the `ci-tools` release has Zig
+  0.17.1; until then CI and `prove.sh` (without a 0.17.x zig on PATH) fail at setup.
+- None of the CI changes has run on GitHub; the first upstream run is the real
+  check, the macOS jobs on `-2`/`-3` most of all (only cross-compiled here).
+- spider v0.12.0 (2026-11-07) is untested.
