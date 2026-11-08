@@ -43,7 +43,8 @@ release and lands in `<target>/.tools/`. Until that release is reseeded with
 | rodney | 0.4.0 | `tools.lock` (PyPI) |
 | showboat | 0.6.1 | `tools.lock` (PyPI) |
 
-To bump a tool, edit `tools.lock` and reseed; see
+`tools.lock` is the source of truth; this table only mirrors it. To bump a tool,
+edit `tools.lock` and reseed; see
 [`scaffolding/ci/README.md`](scaffolding/ci/README.md).
 
 ## Develop

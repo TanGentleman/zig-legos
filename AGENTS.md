@@ -16,7 +16,7 @@ examples/      # sysdiag — a full spider+HTMX app wired to the scaffolding
 ## Rules of thumb
 
 - Read `skills/spider/references/cheatsheet.md` and `gotchas.md` **before**
-  writing or editing any spider code — the spider/Zig 0.17-dev API moves fast,
+  writing or editing any spider code — the spider API moves between tags,
   so verify against source, never memory.
 - All tool versions are pinned in `scaffolding/ci/tools.lock`. Don't hardcode a
   Zig/Chrome/uv version anywhere else; bump the lock and re-seed (see
