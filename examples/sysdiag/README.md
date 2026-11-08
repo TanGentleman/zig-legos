@@ -26,8 +26,8 @@ One script proves the whole loop on a fresh clone — setup, build, run, and a
 headless-Chrome photo of the live page:
 
 ```sh
-git clone https://github.com/TanGentleman/tracers
-cd tracers/sysdiag
+git clone https://github.com/TanGentleman/zig-legos
+cd zig-legos/examples/sysdiag
 ./quickstart.sh   # 1. setup pinned tools  2. zig build + run  3. rodney screenshot
 ```
 
@@ -57,7 +57,7 @@ uv tool install rodney   # screenshot CLI (optional — quickstart installs it)
 ## Run it
 
 ```sh
-cd sysdiag
+cd examples/sysdiag
 source .tools/env   # skip if zig 0.17.0-dev is already on your PATH
 zig build
 ./zig-out/bin/sysdiag

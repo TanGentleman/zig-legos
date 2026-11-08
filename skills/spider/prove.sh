@@ -57,7 +57,7 @@ import json
 d = json.load(open('$lock')); t = d['tools']
 print(d['release_tag'], *[t[k]['platforms']['$plat']['asset'] for k in ('zig', 'uv', 'chrome')], t['rodney']['version'], t['showboat']['version'])
 ")
-base="https://github.com/TanGentleman/tracers/releases/download/$tag"
+base="https://github.com/TanGentleman/zig-legos/releases/download/$tag"
 
 # Demo runs 5 steps; --no-demo stops after build/run (3 steps).
 total=5; $do_demo || total=3

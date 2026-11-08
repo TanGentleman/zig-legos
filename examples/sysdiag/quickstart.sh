@@ -4,10 +4,10 @@
 #   2. build  — zig build, then boot the server on :3000
 #   3. photo  — rodney (headless Chrome) screenshots the live dashboard
 #
-#   cd sysdiag && ./quickstart.sh
+#   cd examples/sysdiag && ./quickstart.sh
 #
 # Tools already on PATH are reused; anything missing is downloaded into
-# sysdiag/.tools/ (gitignored, ~250 MB first run, cached after). The only
+# examples/sysdiag/.tools/ (gitignored, ~250 MB first run, cached after). The only
 # install outside the repo is `uv tool install rodney` if rodney is absent.
 # Needs: bash, curl, python3, shasum, tar, unzip — stock on macOS and Ubuntu.
 set -euo pipefail
@@ -30,7 +30,7 @@ import json
 d = json.load(open('$lock')); t = d['tools']
 print(d['release_tag'], *[t[k]['platforms']['$plat']['asset'] for k in ('zig', 'uv', 'chrome')], t['rodney']['version'])
 ")
-base="https://github.com/TanGentleman/tracers/releases/download/$tag"
+base="https://github.com/TanGentleman/zig-legos/releases/download/$tag"
 
 # Download a release asset into .tools/ (once) and verify it against SHA256SUMS.
 # Progress goes to stderr: callers capture stdout (see install_tarball).
@@ -146,6 +146,6 @@ rodney screenshot -w 1100 -h 680 "$here/quickstart.png"
 rodney stop
 
 echo
-echo "OK — live dashboard captured at sysdiag/quickstart.png"
+echo "OK — live dashboard captured at examples/sysdiag/quickstart.png"
 echo "Put the same tools on your PATH:  source .tools/env"
 echo "Then hack away: zig build && ./zig-out/bin/sysdiag, and open http://127.0.0.1:3000"
