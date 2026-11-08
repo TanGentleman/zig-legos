@@ -26,11 +26,12 @@ source /tmp/my-app/.tools/env                  # the tools prove.sh used
 skills/spider/prove.sh /tmp/my-app             # adds a headless-Chrome screenshot and demo.md
 ```
 
-`prove.sh` and `quickstart.sh` reuse a Zig 0.17.x, uv and Chrome
-(`ROD_CHROME_BIN`) already on PATH. Anything missing comes from the `ci-tools`
+`prove.sh` and `quickstart.sh` reuse a Zig 0.17.x and uv already on PATH, and
+Chrome from `ROD_CHROME_BIN` or `/usr/bin/google-chrome`, `chromium` or
+`chromium-browser` (not PATH). Anything missing comes from the `ci-tools`
 release and lands in `<target>/.tools/`. Until that release is reseeded with
-`tools.lock`, put [Zig 0.17.1](https://ziglang.org/download/) on PATH yourself
-(see Boundaries).
+`tools.lock`, put [Zig 0.17.1](https://ziglang.org/download/) on PATH and set
+`ROD_CHROME_BIN` yourself (see Boundaries).
 
 ## Pins
 

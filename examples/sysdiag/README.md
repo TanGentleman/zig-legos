@@ -22,7 +22,8 @@ amber (≥60%) to red (≥85%). Everything — page, htmx, CSS — is embedded i
 
 ## Quick start
 
-Linux x86_64. Reuses Zig 0.17.x, uv and Chrome (`ROD_CHROME_BIN`) from PATH and
+Linux x86_64. Reuses Zig 0.17.x and uv from PATH, Chrome from `ROD_CHROME_BIN` or
+`/usr/bin/google-chrome`/`chromium`, and
 downloads anything missing from the [`ci-tools` release](../../scaffolding/ci/README.md)
 into `.tools/` (gitignored).
 
