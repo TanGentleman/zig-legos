@@ -1,5 +1,5 @@
-# Build and test the worked example and the skill's app template on Linux and
-# macOS, then capture a live rodney screenshot of the example.
+# Build and test the worked example and the skill's app template on Linux,
+# then capture a live rodney screenshot of the example.
 # All build tools (Zig, uv, Chrome for Testing) come from the repo's own pinned
 # `ci-tools` release via the setup-mirrored-tools action — no third-party CDNs at
 # run time. ROD_CHROME_BIN is set by that action so rodney never downloads a
@@ -33,7 +33,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15]
+        # macOS is off: spider >= v0.8 calls std.os.linux.clock_gettime in
+        # src/modules/health.zig, so apps don't compile for macOS on Zig 0.17.
+        os: [ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7.0.0
@@ -56,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15] # macos-15 is arm64 → exercises the Darwin backend
+        os: [ubuntu-24.04] # add macos-15 (arm64, Darwin backend) once spider builds for macOS
     runs-on: ${{ matrix.os }}
     defaults:
       run:

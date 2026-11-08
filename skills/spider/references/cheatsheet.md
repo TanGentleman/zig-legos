@@ -1,4 +1,4 @@
-# spider v0.6.7 API cheatsheet (verified against source, 2026-06)
+# spider v0.11.0 API cheatsheet (verified against source, 2026-11)
 
 ## App and routes
 
@@ -9,13 +9,15 @@ pub fn main() void {
     var server = spider.app(.{});
     defer server.deinit();
     server
-        .get("/", index)            // also .post/.put/.patch/.delete
-        .get("/users/:id", show)    // :params via trie router
+        .get("/", index, .{})            // also .post/.put/.patch/.delete
+        .get("/users/:id", show, .{})    // :params via trie router
         .listen(.{ .port = 3000 }) catch {};   // .host = "0.0.0.0" also accepted
 }
 ```
 
-Handlers are `fn (c: *spider.Ctx) !spider.Response`. `/up` health route is built in.
+Handlers are `fn (c: *spider.Ctx) !spider.Response`. The third argument is the route
+config and is required (`.{}` for none; `.public`, `.roles`, … are checked at compile
+time). `/up` health route is built in.
 The template ships a `spider.config.zig` (registered in `build.zig` via
 `spider_mod.addImport("spider_config", cfg_mod)`) so the server boots without the
 `No spider.config.zig` / `views_dir not found` warnings. Its `views_dir = null`
@@ -27,7 +29,7 @@ declares this app embeds its assets and uses no runtime template engine.
 c.arena                          // per-request allocator, freed after the response
 c.params.get("id")               // ?[]const u8, from :id in the route
                                  //   (README shows c.param("id") — that method does
-                                 //    NOT exist in v0.6.7; use the params hashmap)
+                                 //    NOT exist in v0.11.0; use the params hashmap)
 c.query("q")                     // ?[]const u8
 c.header("x-thing")              // ?[]const u8
 c.isHtmx()                       // true if HX-Request header present

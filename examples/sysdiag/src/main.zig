@@ -14,10 +14,10 @@ pub fn main() void {
     var server = spider.app(.{});
     defer server.deinit();
     server
-        .get("/", index)
-        .get("/htmx.js", htmxJs) // vendored htmx 2.0.4, embedded in the binary
-        .get("/metrics", metricsFragment)
-        .get("/api/metrics", metricsJson)
+        .get("/", index, .{})
+        .get("/htmx.js", htmxJs, .{}) // vendored htmx 2.0.4, embedded in the binary
+        .get("/metrics", metricsFragment, .{})
+        .get("/api/metrics", metricsJson, .{})
         .listen(.{ .port = 3000 }) catch {};
 }
 

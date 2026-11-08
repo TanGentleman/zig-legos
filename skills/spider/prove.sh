@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # prove.sh — zero-to-demo lifecycle for a spider + HTMX app.
 #
-#   1. setup     — ensure a spider-capable Zig (0.17.0-dev) + uv (and, for the
+#   1. setup     — ensure a spider-capable Zig (0.17.x) + uv (and, for the
 #                  demo, rodney + showboat + a headless Chrome)
 #   2. scaffold  — copy this spider skill's template into <target> (if absent)
 #   3. build/run — zig build, boot the server on :3000, wait for /up
@@ -94,8 +94,8 @@ install_tarball() { # install_tarball <asset> <ext>
 
 echo "== 1/$total setup =="
 
-# Zig: any 0.17.0-dev on PATH clears spider's floor; otherwise use the pinned nightly.
-if zig version 2>/dev/null | grep -q '^0\.17\.0-dev'; then
+# Zig: any 0.17.x release on PATH clears spider's floor; otherwise use the pinned one.
+if zig version 2>/dev/null | grep -Eq '^0\.17\.[0-9]+$'; then
   echo ">> using zig $(zig version) from PATH"
 else
   zig_dir=$(install_tarball "$zig_asset" .tar.xz)

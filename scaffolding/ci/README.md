@@ -1,6 +1,6 @@
 # CI tool mirror
 
-CI and the example apps pull their build tools — Zig nightly, uv, Chrome for
+CI and the example apps pull their build tools — Zig, uv, Chrome for
 Testing — from a single rolling `ci-tools` release **this repo owns**, instead of
 third-party CDNs. Runs are reproducible (every byte is checksum-pinned) and
 network-isolated (the only CDN traffic happens at seed time, not in CI).
@@ -36,7 +36,7 @@ contributor machine.
 ## Provenance shapes
 
 `seed.sh` verifies each download one of three ways, recorded in `tools.lock`:
-`sha256` (hardcoded expected hash — Zig), `sha256_url` (upstream-published
+`sha256` (hardcoded expected hash from ziglang.org's index.json — Zig), `sha256_url` (upstream-published
 hash fetched at seed time — uv), or neither (trust-on-first-use: the hash is
 recorded into `SHA256SUMS` at seed time — Chrome, which Google publishes no
 per-file checksum for). Whatever the shape, CI re-verifies every asset against

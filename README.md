@@ -14,13 +14,14 @@ skills/spider/prove.sh my-app   # fetch pinned tools, scaffold, build, serve, sc
 `my-app/` is a working spider app (HTMX page, vendored htmx, `zig build test`),
 `my-app/demo/demo.md` holds real `curl` output plus a headless-Chrome screenshot.
 `--no-demo` skips the browser and just scaffolds, builds and serves.
-Linux x86_64 and macOS arm64. Needs bash, curl, git, python3, tar, unzip.
+Linux x86_64 (macOS waits on a spider fix, see
+[gotchas](skills/spider/references/gotchas.md)). Needs bash, curl, git, python3, tar, unzip.
 
 ## What's here
 
 | Piece | What it is |
 |---|---|
-| [`skills/spider/`](skills/spider/SKILL.md) | A Claude Code skill: app template, spider v0.6.7 API cheatsheet and gotchas, and `prove.sh`. |
+| [`skills/spider/`](skills/spider/SKILL.md) | A Claude Code skill: app template, spider v0.11.0 API cheatsheet and gotchas, and `prove.sh`. |
 | [`examples/sysdiag/`](examples/sysdiag/README.md) | A live system dashboard (CPU, memory, disk) on spider + HTMX. `./quickstart.sh` builds it and screenshots it. |
 | [`scaffolding/ci/`](scaffolding/ci/README.md) | `tools.lock` (Zig, uv, Chrome for Testing, rodney, showboat) and `seed.sh`, which mirrors them into this repo's `ci-tools` release. |
 | [`scaffolding/setup-mirrored-tools/`](scaffolding/setup-mirrored-tools/action.yml) | GitHub Action that installs the pinned tools and verifies every checksum. |
@@ -42,8 +43,8 @@ zig build test && zig build && ./zig-out/bin/sysdiag   # http://127.0.0.1:3000
 ```
 
 CI ([`sysdiag-ci.yml`](.github/workflows/sysdiag-ci.yml)) runs `zig fmt --check`,
-builds and tests the template and sysdiag on Linux and macOS, and uploads a
-dashboard screenshot per OS.
+builds and tests the template and sysdiag on Linux, and uploads a dashboard
+screenshot.
 
 Factored out of Tan's tracers monorepo; same spirit as
 [zigpeek](https://github.com/TanGentleman/zigpeek).

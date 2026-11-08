@@ -66,8 +66,8 @@ install_tarball() { # install_tarball <asset> <ext>
 
 echo "== 1/3 setup =="
 
-# Zig: any 0.17.0-dev on PATH works (spider's floor); otherwise use the pinned nightly.
-if zig version 2>/dev/null | grep -q '^0\.17\.0-dev'; then
+# Zig: any 0.17.x release on PATH works (spider's floor); otherwise use the pinned one.
+if zig version 2>/dev/null | grep -Eq '^0\.17\.[0-9]+$'; then
   echo ">> using zig $(zig version) from PATH"
 else
   zig_dir=$(install_tarball "$zig_asset" .tar.xz)
