@@ -3,7 +3,7 @@
 A single-binary local web dashboard for basic system usage diagnostics, built on
 [spider](https://github.com/llllOllOOll/spider) v0.6.7 with HTMX.
 
-![sysdiag dashboard](demo/408bba59-2026-06-11.png)
+![sysdiag dashboard](demo/4e4301f4-2026-11-08.png)
 
 ## What it shows
 
@@ -44,14 +44,14 @@ your own shell afterwards (for `zig build`, `rodney`, …):
 source .tools/env
 ```
 
-Prefer installing tools yourself? Any Zig `0.17.0-dev` ≥ dev.667 (spider's
-floor — the repo's 0.16 pin won't build it) and any uv work; the script picks
+Prefer installing tools yourself? Any Zig `0.17.0-dev` ≥ dev.667 (spider
+v0.6.7's floor) and any uv work; the script picks
 up whatever is on PATH:
 
 ```sh
 brew install uv          # or: curl -LsSf https://astral.sh/uv/install.sh | sh
 uv tool install rodney   # screenshot CLI (optional — quickstart installs it)
-# Zig nightlies: https://ziglang.org/download/ — CI's exact pinned build is in ../../scaffolding/ci/tools.lock
+# the pinned nightly is no longer on ziglang.org; quickstart.sh fetches it from the ci-tools release
 ```
 
 ## Run it
@@ -71,6 +71,7 @@ zig build
 document: captured `curl` output from the live server plus a
 [rodney](https://pypi.org/project/rodney/) (headless Chrome) screenshot of the page.
 
-CI (`.github/workflows/sysdiag-ci.yml`) builds on Linux and macOS, runs the server,
-and uploads a live dashboard screenshot per OS as a build artifact. It pins Chrome
-to the runner's pre-installed binary (`ROD_CHROME_BIN`) so no browser is downloaded.
+CI (`.github/workflows/sysdiag-ci.yml`) builds and tests on Linux and macOS, runs
+the server, smoke-tests the routes, and uploads a live dashboard screenshot per OS.
+Chrome comes from the pinned `ci-tools` release (`ROD_CHROME_BIN`), so rodney
+downloads no browser.

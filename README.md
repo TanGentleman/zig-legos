@@ -1,46 +1,49 @@
 # zig-legos
 
-Reusable building blocks for shipping **Zig + spider + HTMX** apps, fast and
-proven — the skills, the pinned toolchain scaffolding, and worked examples,
-factored out of [tracers](https://github.com/TanGentleman/tracers) so they stand
-on their own.
+[![CI](https://github.com/TanGentleman/zig-legos/actions/workflows/sysdiag-ci.yml/badge.svg)](https://github.com/TanGentleman/zig-legos/actions/workflows/sysdiag-ci.yml)
 
-If you've used [zigpeek](https://github.com/TanGentleman/zigpeek), this is the
-same spirit: small, single-purpose, **offline-capable, version-pinned** tooling
-that doubles as a Claude Code skill. Each "lego" is a skill *plus* the
-scaffolding it needs *plus* a worked example you can run end-to-end.
+Get a running, screenshot-proven Zig web app on
+[spider](https://github.com/llllOllOOll/spider) + HTMX in one command, with
+every tool version pinned and checksum-verified.
+
+```sh
+git clone https://github.com/TanGentleman/zig-legos && cd zig-legos
+skills/spider/prove.sh my-app   # fetch pinned tools, scaffold, build, serve, screenshot
+```
+
+`my-app/` is a working spider app (HTMX page, vendored htmx, `zig build test`),
+`my-app/demo/demo.md` holds real `curl` output plus a headless-Chrome screenshot.
+`--no-demo` skips the browser and just scaffolds, builds and serves.
+Linux x86_64 and macOS arm64. Needs bash, curl, git, python3, tar, unzip.
 
 ## What's here
 
-| Piece | What it gives you |
+| Piece | What it is |
 |---|---|
-| [`skills/spider/`](skills/spider/SKILL.md) | Build *and* prove Zig HTTP, JSON, and HTMX services on spider v0.6.7 — a known-good app template, the API cheatsheet + gotchas, and `prove.sh`, the one-command scaffold → build → screenshot → [showboat](https://pypi.org/project/showboat/) demo lifecycle. |
-| [`scaffolding/ci/`](scaffolding/ci/README.md) | The dependency-pinning core: `tools.lock` (Zig/uv/Chrome, checksum-pinned), `seed.sh` (mirror them into a `ci-tools` release), and the story behind it. |
-| [`scaffolding/setup-mirrored-tools/`](scaffolding/setup-mirrored-tools/action.yml) | A composite GitHub Action that fetches the pinned tools for the runner and verifies every byte — drop-in for any app's CI. |
-| [`.github/workflows/`](.github/workflows/) | CI: seed the `ci-tools` release; build + screenshot the sysdiag example on Linux and macOS. |
-| [`plugins/spider-bundle/`](plugins/spider-bundle/README.md) | `pack.sh` bundles the `spider` skill + a vendored `tools.lock` into something you can hand to anyone — no checkout required. |
-| [`examples/sysdiag/`](examples/sysdiag/README.md) | A complete spider + HTMX app (a live system-usage dashboard) wired to the scaffolding above — the reference every new app is modeled on. |
+| [`skills/spider/`](skills/spider/SKILL.md) | A Claude Code skill: app template, spider v0.6.7 API cheatsheet and gotchas, and `prove.sh`. |
+| [`examples/sysdiag/`](examples/sysdiag/README.md) | A live system dashboard (CPU, memory, disk) on spider + HTMX. `./quickstart.sh` builds it and screenshots it. |
+| [`scaffolding/ci/`](scaffolding/ci/README.md) | `tools.lock` (Zig, uv, Chrome for Testing, rodney, showboat) and `seed.sh`, which mirrors them into this repo's `ci-tools` release. |
+| [`scaffolding/setup-mirrored-tools/`](scaffolding/setup-mirrored-tools/action.yml) | GitHub Action that installs the pinned tools and verifies every checksum. |
+| [`plugins/spider-bundle/`](plugins/spider-bundle/README.md) | `pack.sh` bundles the skill and its lock so it works without this repo. |
 
-## The pinning principle
+## Pinning
 
-Every tool version (Zig nightly, uv, Chrome for Testing, rodney, showboat) is
-pinned in one place — [`scaffolding/ci/tools.lock`](scaffolding/ci/tools.lock) —
-and served from a single checksum-verified `ci-tools` release. CI and the
-quickstarts pull from the same release, so a fresh clone and a CI run get byte-
-identical tools, and the only CDN traffic happens at seed time. New apps reuse
-this instead of re-deriving a toolchain. See
-[`scaffolding/ci/README.md`](scaffolding/ci/README.md).
+All tool versions live in [`scaffolding/ci/tools.lock`](scaffolding/ci/tools.lock).
+CI, `prove.sh` and `quickstart.sh` download them from the repo's `ci-tools`
+release and check them against its `SHA256SUMS`, so a fresh clone and CI get the
+same bytes. The spider dependency is pinned by commit and hash in each
+`build.zig.zon`. To bump a tool, see [`scaffolding/ci/README.md`](scaffolding/ci/README.md).
 
-## Quickstart (the worked example)
+## Develop
 
 ```sh
-cd examples/sysdiag
-./quickstart.sh   # pinned tools → zig build → run → headless-Chrome screenshot
+cd examples/sysdiag && source .tools/env   # after one quickstart.sh run
+zig build test && zig build && ./zig-out/bin/sysdiag   # http://127.0.0.1:3000
 ```
 
-When `quickstart.png` shows your machine's numbers, the whole chain works. To
-scaffold a *new* app instead, drive the `spider` skill:
+CI ([`sysdiag-ci.yml`](.github/workflows/sysdiag-ci.yml)) runs `zig fmt --check`,
+builds and tests the template and sysdiag on Linux and macOS, and uploads a
+dashboard screenshot per OS.
 
-```sh
-skills/spider/prove.sh my-app   # scaffold + build + prove a fresh spider app
-```
+Factored out of Tan's tracers monorepo; same spirit as
+[zigpeek](https://github.com/TanGentleman/zigpeek).
