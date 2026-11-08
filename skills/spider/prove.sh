@@ -162,6 +162,7 @@ fi
 .rodney/
 zig-out/
 .zig-cache/
+zig-pkg/
 .env
 EOF
 cd "$target"
