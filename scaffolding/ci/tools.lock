@@ -17,30 +17,30 @@
       }
     },
     "chrome": {
-      "version": "149.0.7827.55",
+      "version": "157.0.8103.38",
       "platforms": {
         "linux-x86_64": {
-          "url": "https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.55/linux64/chrome-linux64.zip",
-          "asset": "chrome-149.0.7827.55-linux64.zip"
+          "url": "https://storage.googleapis.com/chrome-for-testing-public/157.0.8103.38/linux64/chrome-linux64.zip",
+          "asset": "chrome-157.0.8103.38-linux64.zip"
         },
         "macos-aarch64": {
-          "url": "https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.55/mac-arm64/chrome-mac-arm64.zip",
-          "asset": "chrome-149.0.7827.55-mac-arm64.zip"
+          "url": "https://storage.googleapis.com/chrome-for-testing-public/157.0.8103.38/mac-arm64/chrome-mac-arm64.zip",
+          "asset": "chrome-157.0.8103.38-mac-arm64.zip"
         }
       }
     },
     "uv": {
-      "version": "0.11.20",
+      "version": "0.13.7",
       "platforms": {
         "linux-x86_64": {
-          "url": "https://github.com/astral-sh/uv/releases/download/0.11.20/uv-x86_64-unknown-linux-gnu.tar.gz",
-          "asset": "uv-0.11.20-linux-x86_64.tar.gz",
-          "sha256_url": "https://github.com/astral-sh/uv/releases/download/0.11.20/uv-x86_64-unknown-linux-gnu.tar.gz.sha256"
+          "url": "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-x86_64-unknown-linux-gnu.tar.gz",
+          "asset": "uv-0.13.7-linux-x86_64.tar.gz",
+          "sha256_url": "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-x86_64-unknown-linux-gnu.tar.gz.sha256"
         },
         "macos-aarch64": {
-          "url": "https://github.com/astral-sh/uv/releases/download/0.11.20/uv-aarch64-apple-darwin.tar.gz",
-          "asset": "uv-0.11.20-macos-aarch64.tar.gz",
-          "sha256_url": "https://github.com/astral-sh/uv/releases/download/0.11.20/uv-aarch64-apple-darwin.tar.gz.sha256"
+          "url": "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-aarch64-apple-darwin.tar.gz",
+          "asset": "uv-0.13.7-macos-aarch64.tar.gz",
+          "sha256_url": "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-aarch64-apple-darwin.tar.gz.sha256"
         }
       }
     },
