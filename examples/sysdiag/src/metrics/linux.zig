@@ -128,3 +128,21 @@ pub fn collect(c: *spider.Ctx) !Metrics {
 
     return m;
 }
+
+test "meminfoValue" {
+    const text =
+        \\MemTotal:       32866612 kB
+        \\MemFree:        29000000 kB
+        \\MemAvailable:   31360280 kB
+        \\SwapTotal:             0 kB
+    ;
+    try std.testing.expectEqual(@as(u64, 32866612), meminfoValue(text, "MemTotal:"));
+    try std.testing.expectEqual(@as(u64, 31360280), meminfoValue(text, "MemAvailable:"));
+    try std.testing.expectEqual(@as(u64, 0), meminfoValue(text, "SwapTotal:"));
+    try std.testing.expectEqual(@as(u64, 0), meminfoValue(text, "SwapFree:"));
+}
+
+test "firstToken" {
+    try std.testing.expectEqualStrings("692.31", firstToken("692.31 5480.12\n"));
+    try std.testing.expectEqualStrings("", firstToken("   "));
+}

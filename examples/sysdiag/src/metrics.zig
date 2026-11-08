@@ -32,3 +32,7 @@ const impl = switch (builtin.os.tag) {
 pub fn collect(c: *spider.Ctx) !Metrics {
     return impl.collect(c);
 }
+
+test {
+    _ = impl;
+}

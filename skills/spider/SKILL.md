@@ -79,6 +79,8 @@ every signature verified against v0.6.7 source. Rules of thumb:
 
 - spider runs many worker threads — any shared mutable state must be `std.atomic.Value`.
 - Allocate per-request memory from `c.arena`; it is freed after the response.
+- `zig build test` runs the app's `test` blocks; keep parsing and formatting in
+  plain functions so they can be tested without a server.
 - New dependency pins: `$ZIG fetch --save 'git+https://github.com/llllOllOOll/spider#v0.6.7'`.
 - When the cheatsheet doesn't cover an API, do NOT trust memory (0.16/0.17 drift):
   clone spider guarded (`[ -d temp/spider ] || git clone --depth 1 --branch v0.6.7

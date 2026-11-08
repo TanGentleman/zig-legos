@@ -137,3 +137,19 @@ fn metricsFragment(c: *spider.Ctx) !spider.Response {
     });
     return c.html(html, .{});
 }
+
+test {
+    _ = metrics;
+}
+
+test "pctUsed" {
+    try std.testing.expectEqual(@as(f64, 0), pctUsed(0, 0));
+    try std.testing.expectEqual(@as(f64, 25), pctUsed(400, 300));
+    try std.testing.expectEqual(@as(f64, 100), pctUsed(400, 0));
+}
+
+test "barClass thresholds" {
+    try std.testing.expectEqualStrings("bar", barClass(59.9));
+    try std.testing.expectEqualStrings("bar warm", barClass(60));
+    try std.testing.expectEqualStrings("bar hot", barClass(85));
+}

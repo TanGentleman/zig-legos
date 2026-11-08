@@ -59,6 +59,7 @@ uv tool install rodney   # screenshot CLI (optional — quickstart installs it)
 ```sh
 cd examples/sysdiag
 source .tools/env   # skip if zig 0.17.0-dev is already on your PATH
+zig build test   # unit tests (parsers, thresholds)
 zig build
 ./zig-out/bin/sysdiag
 # open http://127.0.0.1:3000
