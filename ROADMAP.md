@@ -44,8 +44,8 @@ the setup code duplicated between `quickstart.sh` and `prove.sh`.
 
 ```bash
 # in kranti-sandbox; N = the last branch you want (1..4)
-base=$(git log -1 --format=%H --grep='^Import zig-legos upstream' zig-legos-1)
-git format-patch --relative=zig-legos "$base"..zig-legos-N -o /tmp/zig-legos-N
+base=$(git log -1 --format=%H --grep='^Import zig-legos upstream' origin/zig-legos-1)
+git format-patch --relative=zig-legos "$base"..origin/zig-legos-N -o /tmp/zig-legos-N
 # in a clean upstream clone at 9be30bb
 git clone https://github.com/TanGentleman/zig-legos && cd zig-legos
 git am /tmp/zig-legos-N/*.patch
@@ -54,7 +54,7 @@ skills/spider/prove.sh --no-demo /tmp/spider-app && (cd /tmp/spider-app && zig b
 (cd examples/sysdiag && ./quickstart.sh && zig build test)   # from -2 on
 ```
 
-One branch at a time: `zig-legos-1..zig-legos-2`, and so on. With `-4`, put Zig
+One branch at a time: `origin/zig-legos-1..origin/zig-legos-2`, and so on. With `-4`, put Zig
 0.17.1 on PATH or run the seed workflow first (see below).
 
 ## Needs Tan
@@ -64,6 +64,8 @@ One branch at a time: `zig-legos-1..zig-legos-2`, and so on. With `-4`, put Zig
   it the stack stays on the mirrored nightly, which still works on both OSes.
 - After `-4`: run the `seed-ci-tools` workflow so the `ci-tools` release has Zig
   0.17.1; until then CI and `prove.sh` (without a 0.17.x zig on PATH) fail at setup.
+  `seed.sh` deletes and recreates the release, so the `0.17.0-dev.813` assets
+  go with it: seed only once `-4` is merged, or `-1`..`-3` fail at setup too.
 - None of the CI changes has run on GitHub; the first upstream run is the real
   check, the macOS jobs on `-2`/`-3` most of all (only cross-compiled here).
 - spider v0.12.0 (2026-11-07) is untested.
