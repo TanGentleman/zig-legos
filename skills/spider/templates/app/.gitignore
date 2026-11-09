@@ -4,3 +4,4 @@ zig-out/
 .rodney/
 quickstart.png
 .env
+zig-pkg/

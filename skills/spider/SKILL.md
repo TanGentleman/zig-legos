@@ -1,12 +1,12 @@
 ---
 name: spider
-description: Build and prove web servers in Zig using the spider framework — HTTP services, JSON APIs, or HTMX UIs. Covers the toolchain gate, scaffolding from a known-good template, the spider v0.6.7 API, the one-command build-and-prove lifecycle (prove.sh), and proving the result with showboat/rodney.
+description: Build and prove web servers in Zig using the spider framework — HTTP services, JSON APIs, or HTMX UIs. Covers the toolchain gate, scaffolding from a known-good template, the spider v0.12.0 API, the one-command build-and-prove lifecycle (prove.sh), and proving the result with showboat/rodney.
 ---
 
 # Building (and proving) systems with spider — the Zig web framework
 
-Verified against **spider v0.6.7** on **Zig 0.17.0-dev.813** (2026-06). If you use a
-different spider tag, re-verify against its source — the API moves fast.
+Verified against **spider v0.12.0** on **Zig 0.17.1** (2026-11), Linux. If you use a
+different spider tag, re-verify against its source and `llms.txt` — the API moves fast.
 
 Read `references/cheatsheet.md` and `references/gotchas.md` BEFORE writing any code.
 
@@ -21,7 +21,7 @@ skills/spider/prove.sh [--no-demo] [target-dir]   # default: ./spider-app-demo
 
 Five steps, stopping at the first hard failure:
 
-1. **setup** — reuse a 0.17.0-dev Zig + uv if on PATH, else fetch the pinned ones
+1. **setup** — reuse a Zig 0.17.x + uv if on PATH, else fetch the pinned ones
    (checksum-verified) into `<target>/.tools/`; for the demo, `uv tool install`
    pinned rodney + showboat and resolve a Chrome for `ROD_CHROME_BIN`.
 2. **scaffold** — copy this skill's `templates/app` into `<target>` *only if absent*
@@ -40,16 +40,17 @@ app or the script can't cover your case.
 
 ## 1. Toolchain gate (do this first, it blocks everything)
 
-spider v0.6.7 requires Zig `0.17.0-dev` >= dev.667. The repo's pinned toolchain
-already satisfies that floor; if your PATH zig is older, fetch a project-local nightly:
+spider v0.12.0 requires a Zig 0.17 release (`minimum_zig_version = "0.17.0"`). The
+repo pins 0.17.1; if your PATH zig is older, fetch a project-local one:
 
 ```sh
-zig version   # if it prints 0.17.0-dev.NNN with NNN >= 667, skip the rest
-curl -sL https://ziglang.org/download/index.json -o /tmp/zigdl.json
-# read .master."x86_64-linux".tarball from it, then:
-curl -sL -o /tmp/zig.tar.xz <tarball-url> && tar xf /tmp/zig.tar.xz -C /tmp
-export ZIG=/tmp/zig-x86_64-linux-<version>/zig   # use $ZIG everywhere below
+zig version   # if it prints 0.17.x, skip the rest
+curl -sL -o /tmp/zig.tar.xz https://ziglang.org/download/0.17.1/zig-x86_64-linux-0.17.1.tar.xz
+tar xf /tmp/zig.tar.xz -C /tmp
+export ZIG=/tmp/zig-x86_64-linux-0.17.1/zig   # use $ZIG everywhere below
 ```
+
+macOS: spider >= v0.8 does not compile apps for macOS on Zig 0.17 (see gotchas).
 
 ## 2. Scaffold from the template (don't hand-roll)
 
@@ -75,15 +76,17 @@ error message prints — that is the expected flow, not a failure.
 ## 3. Extend it
 
 Routes, handlers, JSON, HTMX detection, outbound HTTP: all in `references/cheatsheet.md`,
-every signature verified against v0.6.7 source. Rules of thumb:
+every signature verified against v0.12.0 source. Rules of thumb:
 
 - spider runs many worker threads — any shared mutable state must be `std.atomic.Value`.
 - Allocate per-request memory from `c.arena`; it is freed after the response.
-- New dependency pins: `$ZIG fetch --save 'git+https://github.com/llllOllOOll/spider#v0.6.7'`.
+- `zig build test` runs the app's `test` blocks; keep parsing and formatting in
+  plain functions so they can be tested without a server.
+- New dependency pins: `$ZIG fetch --save=spider 'git+https://github.com/llllOllOOll/spider?ref=v0.12.0#ee554ad3b88efef11565162aaade1198547e0dda'`.
 - When the cheatsheet doesn't cover an API, do NOT trust memory (0.16/0.17 drift):
-  clone spider guarded (`[ -d temp/spider ] || git clone --depth 1 --branch v0.6.7
+  clone spider guarded (`[ -d temp/spider ] || git clone --depth 1 --branch v0.12.0
   https://github.com/llllOllOOll/spider temp/spider`) and grep `src/core/context.zig`,
-  `src/core/app.zig`, and the README. zigpeek is for stdlib only.
+  `src/core/app.zig`, and `llms.txt` (the README is partly stale). zigpeek is for stdlib only.
 
 ## 4. Prove it (the deliverable is evidence, not claims)
 

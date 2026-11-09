@@ -1,9 +1,10 @@
-# Worked example: build on both backends and capture a live rodney screenshot.
+# Build and test the worked example and the skill's app template on Linux,
+# then capture a live rodney screenshot of the example.
 # All build tools (Zig, uv, Chrome for Testing) come from the repo's own pinned
 # `ci-tools` release via the setup-mirrored-tools action — no third-party CDNs at
 # run time. ROD_CHROME_BIN is set by that action so rodney never downloads a
 # browser; the assertion below enforces it.
-name: sysdiag example CI
+name: CI
 
 on:
   push:
@@ -13,36 +14,66 @@ on:
       - "scaffolding/ci/tools.lock"
       - ".github/workflows/sysdiag-ci.yml"
       - "examples/sysdiag/**"
+      - "skills/spider/**"
   pull_request:
     paths:
       - "scaffolding/setup-mirrored-tools/**"
       - "scaffolding/ci/tools.lock"
       - ".github/workflows/sysdiag-ci.yml"
       - "examples/sysdiag/**"
+      - "skills/spider/**"
 
 concurrency:
   group: sysdiag-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  template:
+    name: Template build & test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # macOS is off: spider >= v0.8 calls std.os.linux.clock_gettime in
+        # src/modules/health.zig, so apps don't compile for macOS on Zig 0.17.
+        os: [ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up mirrored CI tools
+        uses: ./scaffolding/setup-mirrored-tools
+
+      - name: Format check
+        run: zig fmt --check examples skills
+
+      - name: Scaffold, build and serve the template
+        run: skills/spider/prove.sh --no-demo "$RUNNER_TEMP/app"
+
+      - name: Unit tests
+        working-directory: ${{ runner.temp }}/app
+        run: zig build test --summary all
+
   screenshot:
     name: Build & screenshot (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15] # macos-15 is arm64 → exercises the Darwin backend
+        os: [ubuntu-24.04] # add macos-15 (arm64, Darwin backend) once spider builds for macOS
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: examples/sysdiag
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up mirrored CI tools
         uses: ./scaffolding/setup-mirrored-tools
 
       - name: Build
         run: zig build
+
+      - name: Unit tests
+        run: zig build test --summary all
 
       - name: Run server
         run: |
@@ -53,6 +84,11 @@ jobs:
             sleep 0.5
           done
           echo "server did not come up:"; cat /tmp/sysdiag.log; exit 1
+
+      - name: Smoke-test the routes
+        run: |
+          curl -sf http://127.0.0.1:3000/api/metrics | jq -e '.cores > 0 and .mem_total_kb > 0'
+          curl -sf http://127.0.0.1:3000/metrics | grep -q 'class="card"'
 
       - name: Screenshot the dashboard
         # ROD_CHROME_BIN is exported by setup-mirrored-tools; go-rod uses it and
@@ -81,7 +117,7 @@ jobs:
 
       - name: Upload screenshot artifact
         if: always()
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sysdiag-screenshot-${{ matrix.os }}
           path: /tmp/sysdiag-${{ matrix.os }}.png

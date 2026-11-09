@@ -1,7 +1,7 @@
 # spider-bundle — share the spider build-and-prove workflow
 
 `pack.sh` assembles the `spider` skill into a **self-contained bundle** you can
-hand to anyone — no tracers checkout required on their end.
+hand to anyone — no zig-legos checkout required on their end.
 
 ```sh
 plugins/spider-bundle/pack.sh [out-dir]      # default: ./spider-bundle
@@ -17,4 +17,4 @@ A recipient installs it with the instructions baked into the bundle's own
 `README.md` (copy the skill dir into `~/.claude/skills/`).
 
 ## More info
-[spider skill](/skills/spider/SKILL.md)
+[spider skill](../../skills/spider/SKILL.md)

@@ -3,6 +3,7 @@
 # Zig build output
 zig-out/
 .zig-cache/
+zig-pkg/
 # Demo/proof artifacts generated locally
 **/quickstart.png
 # Packed bundle output

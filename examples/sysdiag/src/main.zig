@@ -11,14 +11,18 @@ const os_name = switch (builtin.os.tag) {
 };
 
 pub fn main() void {
+    serve() catch {};
+}
+
+fn serve() !void {
     var server = spider.app(.{});
     defer server.deinit();
-    server
-        .get("/", index)
-        .get("/htmx.js", htmxJs) // vendored htmx 2.0.4, embedded in the binary
-        .get("/metrics", metricsFragment)
-        .get("/api/metrics", metricsJson)
-        .listen(.{ .port = 3000 }) catch {};
+    try server
+        .get("/", index, .{})
+        .get("/htmx.js", htmxJs, .{}) // vendored htmx 2.0.4, embedded in the binary
+        .get("/metrics", metricsFragment, .{})
+        .get("/api/metrics", metricsJson, .{})
+        .listen(.{ .port = 3000 });
 }
 
 fn index(c: *spider.Ctx) !spider.Response {
@@ -136,4 +140,49 @@ fn metricsFragment(c: *spider.Ctx) !spider.Response {
         m.kernel,
     });
     return c.html(html, .{});
+}
+
+test {
+    _ = metrics;
+}
+
+test "pctUsed" {
+    try std.testing.expectEqual(@as(f64, 0), pctUsed(0, 0));
+    try std.testing.expectEqual(@as(f64, 25), pctUsed(400, 300));
+    try std.testing.expectEqual(@as(f64, 100), pctUsed(400, 0));
+}
+
+test "barClass thresholds" {
+    try std.testing.expectEqualStrings("bar", barClass(59.9));
+    try std.testing.expectEqualStrings("bar warm", barClass(60));
+    try std.testing.expectEqualStrings("bar hot", barClass(85));
+}
+
+// spider.testing.start runs serve() on a free 127.0.0.1 port, once per test binary.
+test "routes" {
+    const app = try spider.testing.start(serve);
+    const cases = [_]struct { path: []const u8, contains: []const u8, content_type: []const u8 }{
+        .{ .path = "/", .contains = "hx-get=\"/metrics\"", .content_type = "text/html" },
+        .{ .path = "/htmx.js", .contains = "htmx", .content_type = "text/javascript" },
+        .{ .path = "/metrics", .contains = "class=\"card\"", .content_type = "text/html" },
+        .{ .path = "/api/metrics", .contains = "\"cores\"", .content_type = "application/json" },
+    };
+    for (cases) |case| {
+        var res = try app.get(case.path);
+        defer res.deinit();
+        try res.expectStatus(200);
+        try res.expectContains(case.contains);
+        try std.testing.expect(std.mem.startsWith(u8, res.header("content-type") orelse "", case.content_type));
+    }
+}
+
+test "api/metrics reports this machine" {
+    if (builtin.os.tag != .linux) return error.SkipZigTest;
+    const app = try spider.testing.start(serve);
+    var res = try app.get("/api/metrics");
+    defer res.deinit();
+    const parsed = try std.json.parseFromSlice(struct { cores: u64, mem_total_kb: u64 }, std.testing.allocator, res.body, .{ .ignore_unknown_fields = true });
+    defer parsed.deinit();
+    try std.testing.expect(parsed.value.cores > 0);
+    try std.testing.expect(parsed.value.mem_total_kb > 0);
 }
